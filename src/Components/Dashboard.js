@@ -4,6 +4,7 @@ import { Box, Tab, Tabs, Typography } from "@mui/material"
 import PropTypes from "prop-types"
 import Plot from "react-plotly.js"
 import { DataGrid } from "@mui/x-data-grid"
+import "./styles/dashboard.css"
 
 const dataPrep = (data, selectedValues = [1,2,3,4,5]) => {
     const pns = data.map(item => {
@@ -63,14 +64,18 @@ function BarChartComp (props) {
                     type: "bar",
                     marker: {
                         color: name === "Prices" ? "#2ecc71" : name === "Discount Percentages" ? "#3498db" : name === "Ratings" ? "#FFD866" : "#8FA64C"
-                    }
+                    },   
                 }
               ]}
               layout={
                 {
                     width: screenWidth,
                     height: "100%",
-                    title: name
+                    title: name,
+                    transition: {
+                        duration: 500,
+                        easing: "linear-in"
+                    }
                 }
               }
             />
@@ -121,7 +126,7 @@ function HorizontalPanel (props) {
     }
 
     return (
-        <Box sx={{ width: "100%" }}>
+        <Box className="h-panel" sx={{ width: "100%" }}>
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                 <Tabs value={value} onChange={handleChange} aria-label='disabled tabs example' centered>
                     <Tab label="Prices" {...a11yProps(0)}></Tab>
