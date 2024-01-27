@@ -1,8 +1,36 @@
 /* body {
     background-color: #aaa;
 } */
+html {
+    margin: 0;
+    padding: 0;
+}
 .chart-conatainer {
     padding: 20px;
     border-radius: 10px;
     background-color: #fff;
+}
+.MuiDataGrid-virtualScrollerContent {
+    background-color: #eee !important;
+}
+.MuiDataGrid-virtualScrollerRenderZone {
+    background-color: #fff !important;
+}
+.js-plotly-plot {
+    border-radius: 10px;
+    background-color: #fff;
+    padding: 10px;
+}
+
+.App {
+    background-color: #eee;
+}
+
+.tabpanel {
+    padding-block: 30px
+}
+.data-table {
+    border-radius: 10px;
+    margin: 10px;
+    padding: 20px;
 }

@@ -1,70 +1,61 @@
-# Getting Started with Create React App
+# KAIBURR - Final Assignment
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Introduction
 
-## Available Scripts
+A SPA (Single Page App) using ReactJS that visualizes large data table with the help of bar charts
 
-In the project directory, you can run:
+## Table of Contents
 
-### `npm start`
+1. ### Packages used
+2. ### Installation and Setup
+3. ### Working and Usage
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Packages used
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+1. mui (Material UI)
+2. prop-types
+3. plotly.js
 
-### `npm test`
+## Installation and Setup
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+To install the project first make a new project directory and clone the project in this directory.
+Run the following to commands one by one to make a new directory named `irshaduddin-final-assignment` and clone the project inside this directory.
+```
+mkdir irshaduddin-final-assignment
+cd irshaduddin-final-assignment
+git clone https://github.com/kaisar12012000/Kaiburr---UI-Assessment.git
+```
 
-### `npm run build`
+Now that the project is cloned we will install all dependencies. First make sure you are on main branch. Then run the following command to install all dependencies.
+```
+npm i
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Once all installations are complete, you are ready to start the server. Run the following command to start the server.
+```
+npm start
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+The frontend server starts on `PORT=3000`. You can access the app at [http://localhost:3000/](http://localhost:3000/).
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Working and Usage
 
-### `npm run eject`
+This is a single page application where on loading a large data is requested from dummyjson.com.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+dummyjson.com provides multiple REST API's from which we are using 2 API's in this project.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The first API used is a GET API for getting all products. Here a query(`limit=0`) is passed to ignore limits in the response. This API returns a response with 100 prooducts.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+The response is processed and stored in state variables. First the response is processed to fetch all numeric data and store them in seperate state variables by a data processor function.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+I have used Material UI's DataGrid component to render the data into a DataTable. MUI's DataGrids comes with built-in props to ease the development process.
 
-## Learn More
+DataGrid comes with an inbuilt sorting function, checkbox onChange handler, virtualization, pagination and much more. I used these inbuilt props to implement lazy loading of data with pagination such that the app performance is optimized and large amount of data can be rendered smoothly.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+The second API used was the search API. It is a GET API where the search query is passed as a URL query parameter. Here I implemented a smart search wherein you type on letter and all relevent data is displayed in the table, the chart changes accordingly too. Here I used the AbortController to pass the signal in the request aborting old pending requests whenever a new request is invoked.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+The last feature is the real time bar chart. The same data processor function that is invoked when component loads is invoked again whenever a checkbox input is changed(checked/unchecked). On every change the DataGrid component has a details array that has indices of all rows with checked checkbox. I used this details array to add or remove data from the bar chart.
 
-### Code Splitting
+### Have a look at it working
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+![Alt-text](https://github.com/kaisar12012000/Kaiburr---UI-Assessment.git/blob/main/demo.gif)

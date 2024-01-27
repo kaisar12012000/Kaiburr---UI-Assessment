@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { API_URLS } from '../constants/urls'
-import { Box, Tab, Tabs, Typography } from "@mui/material"
+import { Box, Tab, Tabs, Typography, Stack, TextField } from "@mui/material"
 import PropTypes from "prop-types"
 import Plot from "react-plotly.js"
 import { DataGrid } from "@mui/x-data-grid"
@@ -69,7 +69,7 @@ function BarChartComp (props) {
               ]}
               layout={
                 {
-                    width: screenWidth,
+                    width: 11*screenWidth/12,
                     height: "100%",
                     title: name,
                     transition: {
@@ -92,6 +92,7 @@ function CustomPanel (props) {
          hidden={value !== index}
          id={`simple-tabpanel-${index}`}
          aria-labelledby={`simple-tab-${index}`}
+         className='tabpanel'
         >
             {value === index && (
               <Box sx={{ width: "100%", height: "100%", textAlign: "center" }}>
@@ -127,7 +128,7 @@ function HorizontalPanel (props) {
 
     return (
         <Box className="h-panel" sx={{ width: "100%" }}>
-            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Box sx={{ borderBottom: 1, borderColor: "divider", backgroundColor: "#fff" }}>
                 <Tabs value={value} onChange={handleChange} aria-label='disabled tabs example' centered>
                     <Tab label="Prices" {...a11yProps(0)}></Tab>
                     <Tab label="Discounts %" {...a11yProps(1)}></Tab>
@@ -155,7 +156,7 @@ function DataTable (props) {
 
     const [selectedItems, setSelectedItems] = useState([])
 
-    const {products, setProductNames, setPrices, setDiscountPercents, setRatings, setStocks} = props
+    const {products, setProducts, setProductNames, setPrices, setDiscountPercents, setRatings, setStocks} = props
 
     const columns = [
         {field: 'id', headerName: 'ID', width: 200},
@@ -173,27 +174,62 @@ function DataTable (props) {
         return {id: item?.id, title: item?.title, brand: item?.brand, category: item?.category, description: item?.description, price: item?.price, discountPercentage: item?.discountPercentage, rating: item?.rating, stock: item?.stock}
     })
 
+    let abortController;
 
-    // useEffect(() => {
-    //     setSelectedItems([1,2,3,4,5])
-    // }, [])
+    const searchHandler = (event) => {
+        const search = event.target.value;
+        const url = API_URLS.searchProduct(search)
+        if (typeof abortController !== typeof undefined) {
+            abortController.abort()
+        }
+
+        abortController = new AbortController()
+
+        fetch(url, {
+            signal: abortController.signal
+        }).then(res => {
+            if(!res.ok) {
+                throw res.status
+            }
+            return res.json()
+        }).then(resData => {
+            setProducts(resData?.products)
+            const {pns, ps, dps, rs, ss} = dataPrep(resData?.products)
+            setProductNames(pns)
+            setPrices(ps)
+            setDiscountPercents(dps)
+            setRatings(rs)
+            setStocks(ss)
+        }).catch(e=>{
+            console.log(e)
+        })
+
+    } 
 
     return (
-        <Box sx={{  width: "100%", height: "50%", overflow: "scroll", position: "absolute"}}>
+        <Box className="data-table" sx={{  width: "-webkit-fill-available", height: "auto", backgroundColor: "#fff"}}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography variant='h4'>
+                    Data Table
+                </Typography>
+                <TextField label="Search product" onChange={searchHandler} InputProps={{ type: "search" }} style={{ width: "50%" }} />
+            </Stack>
             <DataGrid
               rows={rows}
               columns={columns}
               initialState={{
                 pagination: {
                     paginationModel: {
-                        pageSize: 10
+                        pageSize: 100
                     }
                 },
                 
               }}
-              pageSizeOptions={[10, 50, 100, 500, 1000]}
+            //   pageSizeOptions={[10, 50, 100, 500, 1000]}
               checkboxSelection
               disableRowSelectionOnClick
+              rowThreshold={10}
+              rowBuffer={5}
               onRowSelectionModelChange={(details) => {
                 setSelectedItems([...details])
                 const {pns, ps, dps, rs, ss} = dataPrep(products, details)
@@ -205,6 +241,12 @@ function DataTable (props) {
               }}
               density='comfortable'
               rowSelectionModel={selectedItems.length == 0 ? [1,2,3,4,5] : selectedItems}
+              style={{
+                overflow: "scroll",
+                height: "70vh",
+                position: "relative",
+                marginBlock: 10
+              }}
             />
         </Box>
     )
@@ -242,7 +284,7 @@ export default function Dashboard() {
     return (
         <div>
             <HorizontalPanel productNames = {productNames} prices={prices} discountPercentage={discountPercents} ratings={ratings} stocks={stocks} />
-            <DataTable products={products} setProductNames={setProductNames} setPrices={setPrices} setDiscountPercents={setDiscountPercents} setRatings={setRatings} setStocks={setStocks} />
+            <DataTable products={products} setProducts={setProducts} setProductNames={setProductNames} setPrices={setPrices} setDiscountPercents={setDiscountPercents} setRatings={setRatings} setStocks={setStocks} />
         </div>
     )
 }
