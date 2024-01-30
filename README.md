@@ -25,8 +25,11 @@ mkdir irshaduddin-final-assignment
 cd irshaduddin-final-assignment
 git clone https://github.com/kaisar12012000/Kaiburr---UI-Assessment.git
 ```
-
-Now that the project is cloned we will install all dependencies. First make sure you are on main branch. Then run the following command to install all dependencies.
+Now go into Kaiburr---UI-Assessment by running the following command.
+```
+cd Kaiburr---UI-Assessment
+```
+Now that the project is cloned we are inside the project directory we will install all dependencies. First make sure you are on main branch. Then run the following command to install all dependencies.
 ```
 npm i
 ```

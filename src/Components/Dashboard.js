@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { API_URLS } from '../constants/urls'
-import { Box, Tab, Tabs, Typography, Stack, TextField } from "@mui/material"
+import { Box, Tab, Tabs, Typography, Stack, TextField, Checkbox } from "@mui/material"
 import PropTypes from "prop-types"
 import Plot from "react-plotly.js"
-import { DataGrid } from "@mui/x-data-grid"
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import TablePagination from '@mui/material/TablePagination';
+//future reference
+// import { DataGrid } from "@mui/x-data-grid"
 import "./styles/dashboard.css"
 
 const dataPrep = (data, selectedValues = [1,2,3,4,5]) => {
@@ -154,25 +163,29 @@ function HorizontalPanel (props) {
 
 function DataTable (props) {
 
-    const [selectedItems, setSelectedItems] = useState([])
+    const [selectedItems, setSelectedItems] = useState([1,2,3,4,5])
+    const [page, setPage] = useState(0)
+    const [rowsPerPage, setRowsPerPage] = useState(20);
+    const [total, setTotal] = useState(0)
 
     const {products, setProducts, setProductNames, setPrices, setDiscountPercents, setRatings, setStocks} = props
 
-    const columns = [
-        {field: 'id', headerName: 'ID', width: 200},
-        {field: 'title', headerName: 'Title', width: 200},
-        {field: 'brand', headerName: 'Brand', width: 200},
-        {field: 'category', headerName: 'Category', width: 200},
-        {field: 'description', headerName: 'Description', width: 200},
-        {field: 'price', headerName: 'Price', sortable: true},
-        {field: 'discountPercentage', headerName: 'Discount Percentage', sortable: true, width: 200},
-        {field: 'rating', headerName: 'Rating', sortable: true, width: 200},
-        {field: 'stock', headerName: 'Stock', sortable: true, width: 200},
-    ]
+    // future reference
+    // const columns = [
+    //     {field: 'id', headerName: 'ID', width: 200},
+    //     {field: 'title', headerName: 'Title', width: 200},
+    //     {field: 'brand', headerName: 'Brand', width: 200},
+    //     {field: 'category', headerName: 'Category', width: 200},
+    //     {field: 'description', headerName: 'Description', width: 200},
+    //     {field: 'price', headerName: 'Price', sortable: true},
+    //     {field: 'discountPercentage', headerName: 'Discount Percentage', sortable: true, width: 200},
+    //     {field: 'rating', headerName: 'Rating', sortable: true, width: 200},
+    //     {field: 'stock', headerName: 'Stock', sortable: true, width: 200},
+    // ]
 
-    const rows = products.map(item => {
-        return {id: item?.id, title: item?.title, brand: item?.brand, category: item?.category, description: item?.description, price: item?.price, discountPercentage: item?.discountPercentage, rating: item?.rating, stock: item?.stock}
-    })
+    // const rows = products.map(item => {
+    //     return {id: item?.id, title: item?.title, brand: item?.brand, category: item?.category, description: item?.description, price: item?.price, discountPercentage: item?.discountPercentage, rating: item?.rating, stock: item?.stock}
+    // })
 
     let abortController;
 
@@ -194,7 +207,9 @@ function DataTable (props) {
             return res.json()
         }).then(resData => {
             setProducts(resData?.products)
-            const {pns, ps, dps, rs, ss} = dataPrep(resData?.products)
+            setTotal(resData?.total)
+            setPage(0)
+            const {pns, ps, dps, rs, ss} = dataPrep(resData?.products, selectedItems)
             setProductNames(pns)
             setPrices(ps)
             setDiscountPercents(dps)
@@ -206,6 +221,36 @@ function DataTable (props) {
 
     } 
 
+    const hanglePageChange = (event, newPage) => {
+        setPage(newPage)
+    }
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+      };
+
+      useEffect(() => {
+        const url = API_URLS.getAllProducts(rowsPerPage === -1 ? 0 : rowsPerPage*(page+1))
+        fetch(url).then(res => {
+            if (!res.ok)
+                throw res.status;
+            return res.json();
+        }).then(resData => {
+            console.log(resData?.products)
+            setTotal(resData?.total)
+            const {pns, ps, dps, rs, ss} = dataPrep(resData?.products, selectedItems)
+            setProductNames(pns)
+            setPrices(ps)
+            setDiscountPercents(dps)
+            setRatings(rs)
+            setStocks(ss)
+            setProducts(resData?.products)
+        }).catch(e => {
+            console.log("Error fetching data")
+        })
+    }, [page, rowsPerPage]);
+
     return (
         <Box className="data-table" sx={{  width: "-webkit-fill-available", height: "auto", backgroundColor: "#fff"}}>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -214,6 +259,8 @@ function DataTable (props) {
                 </Typography>
                 <TextField label="Search product" onChange={searchHandler} InputProps={{ type: "search" }} style={{ width: "50%" }} />
             </Stack>
+            {/* 
+            future reference
             <DataGrid
               rows={rows}
               columns={columns}
@@ -225,7 +272,6 @@ function DataTable (props) {
                 },
                 
               }}
-            //   pageSizeOptions={[10, 50, 100, 500, 1000]}
               checkboxSelection
               disableRowSelectionOnClick
               rowThreshold={10}
@@ -247,7 +293,107 @@ function DataTable (props) {
                 position: "relative",
                 marginBlock: 10
               }}
+            /> */}
+            <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+            <TableContainer sx={{ maxHeight: "60vh" }}>
+                <Table stickyHeader aria-label="simple table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>
+                                {/* <Checkbox id='check-0' /> */}
+                            </TableCell>
+                            <TableCell align='center'>
+                                <Typography variant="h6">Id</Typography>
+                            </TableCell>
+                            <TableCell align='center'>
+                                <Typography variant="h6">Title</Typography>
+                            </TableCell>
+                            <TableCell align='center'>
+                                <Typography variant="h6">Brand</Typography>
+                            </TableCell>
+                            <TableCell align='center'>
+                                <Typography variant="h6">Category</Typography>
+                            </TableCell>
+                            <TableCell align='center'>
+                                <Typography variant="h6">Description</Typography>
+                            </TableCell>
+                            <TableCell align='center'>
+                                <Typography variant="h6">Price</Typography>
+                            </TableCell>
+                            <TableCell align='center'>
+                                <Typography variant="h6">Discount</Typography> Percentage
+                            </TableCell>
+                            <TableCell align='center'>
+                                <Typography variant="h6">Rating</Typography>
+                            </TableCell>
+                            <TableCell align='center'>
+                                <Typography variant="h6">Stock</Typography>
+                            </TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {(rowsPerPage > 0 ? products.slice(page*rowsPerPage, page*rowsPerPage + rowsPerPage) : products).map((product, index) => (
+                            <TableRow>
+                                <TableCell align='center'>
+                                    <Checkbox id={`check-id-${index}`} checked={selectedItems.includes(product?.id)} onChange={(event) => {
+                                        let temp = [...selectedItems];
+                                        if (event.target.checked) {
+                                            temp.push(product.id)
+                                        } else {
+                                            const i = temp.indexOf(product.id)
+                                            temp.splice(i, 1)
+                                        }
+                                        setSelectedItems(temp)
+                                        const {pns, ps, dps, rs, ss} = dataPrep(products, temp)
+                                            setProductNames(pns)
+                                            setPrices(ps)
+                                            setDiscountPercents(dps)
+                                            setRatings(rs)
+                                            setStocks(ss)
+                                    }} />
+                                </TableCell>
+                                <TableCell align='center'>
+                                    {product?.id}
+                                </TableCell>
+                                <TableCell align='center'>
+                                    {product?.title}
+                                </TableCell>
+                                <TableCell align='center'>
+                                    {product?.brand}
+                                </TableCell>
+                                <TableCell align='center'>
+                                    {product?.category}
+                                </TableCell>
+                                <TableCell align='center'>
+                                    {product?.description}
+                                </TableCell>
+                                <TableCell align='center'>
+                                    {product?.price}
+                                </TableCell>
+                                <TableCell align='center'>
+                                    {product?.discountPercentage}
+                                </TableCell>
+                                <TableCell align='center'>
+                                    {product?.rating}
+                                </TableCell>
+                                <TableCell align='center'>
+                                    {product?.stock}
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <TablePagination
+               rowsPerPageOptions={[20, 50, { label: 'All', value: -1 }]}
+               count={total}
+               rowsPerPage={rowsPerPage}
+               page={page}
+               onPageChange={hanglePageChange}
+               onRowsPerPageChange={handleChangeRowsPerPage}
+               component="div"
             />
+            </Paper>
         </Box>
     )
 }
@@ -260,26 +406,6 @@ export default function Dashboard() {
     const [stocks, setStocks] = useState([])
     const [productNames, setProductNames] = useState([])
     const [err, setErr] = useState("");
-
-    useEffect(() => {
-        const url = API_URLS.getAllProducts()
-        fetch(url).then(res => {
-            if (!res.ok)
-                throw res.status;
-            return res.json();
-        }).then(resData => {
-            console.log(resData?.products)
-            const {pns, ps, dps, rs, ss} = dataPrep(resData?.products)
-            setProductNames(pns)
-            setPrices(ps)
-            setDiscountPercents(dps)
-            setRatings(rs)
-            setStocks(ss)
-            setProducts(resData?.products)
-        }).catch(e => {
-            setErr("Error fetching data")
-        })
-    }, []);
 
     return (
         <div>
