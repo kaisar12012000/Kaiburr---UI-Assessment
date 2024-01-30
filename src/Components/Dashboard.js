@@ -405,7 +405,6 @@ export default function Dashboard() {
     const [ratings, setRatings] = useState([])
     const [stocks, setStocks] = useState([])
     const [productNames, setProductNames] = useState([])
-    const [err, setErr] = useState("");
 
     return (
         <div>
