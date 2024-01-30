@@ -61,4 +61,4 @@ The last feature is the real time bar chart. The same data processor function th
 
 ### Have a look at it working
 
-![Alt-text](https://github.com/kaisar12012000/Kaiburr---UI-Assessment.git/blob/main/demo.gif)
+![Alt-text](https://github.com/kaisar12012000/Kaiburr---UI-Assessment/blob/main/demo.gif)
